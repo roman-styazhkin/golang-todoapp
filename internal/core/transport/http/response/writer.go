@@ -22,7 +22,7 @@ func (rw *HttpResponseWriter) WriteHeader(statusCode int) {
 	rw.statusCode = statusCode
 }
 
-func (rw *HttpResponseWriter) GetStatusCodeOrPanic() int {
+func (rw *HttpResponseWriter) GetStatusCode() int {
 	if rw.statusCode == StatusCodeUninitialized {
 		return http.StatusOK
 	}
