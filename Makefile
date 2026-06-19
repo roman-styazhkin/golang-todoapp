@@ -53,4 +53,6 @@ port-forwarder:
 	@docker compose up -d postgres-forwarder
 
 todoapp-run:
-	@go run cmd/api/main.go
+	@export LOGGER_FOLDER=${PROJECT_ROOT}/out/logs && \
+	export POSTGRES_HOST=localhost && \
+	go run cmd/api/main.go
