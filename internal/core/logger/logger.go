@@ -16,6 +16,16 @@ type Logger struct {
 	file *os.File
 }
 
+type loggerContextKey = struct{}
+
+var (
+	key = loggerContextKey{}
+)
+
+func ToContext(ctx context.Context, logger *Logger) context.Context {
+	return context.WithValue(ctx, key, logger)
+}
+
 func NewLogger(config Config) (*Logger, error) {
 	zapLevel := zap.NewAtomicLevel()
 
@@ -69,7 +79,7 @@ func (l *Logger) With(fields ...zap.Field) *Logger {
 }
 
 func FromContext(ctx context.Context) *Logger {
-	logger, ok := ctx.Value("log").(*Logger)
+	logger, ok := ctx.Value(key).(*Logger)
 
 	if !ok {
 		panic("failed to get logger from context")
