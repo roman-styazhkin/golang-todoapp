@@ -52,6 +52,15 @@ migrate-down:
 port-forwarder:
 	@docker compose up -d postgres-forwarder
 
+logs-cleanup:
+	@read -p "Очистить все log файлы? Опасность утери log файлов. [y/N]: " ans; \
+    	if [ "$$ans" = "y" ]; then \
+    		rm -rf ${PROJECT_ROOT}/out/logs && \
+    		echo "log файлы очищены."; \
+    	else \
+    	  echo "Отмена очистки log файлов"; \
+    	fi;
+
 todoapp-run:
 	@export LOGGER_FOLDER=${PROJECT_ROOT}/out/logs && \
 	export POSTGRES_HOST=localhost && \

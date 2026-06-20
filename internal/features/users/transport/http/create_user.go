@@ -28,7 +28,7 @@ func (h *UsersHttpHandler) CreateUser(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userDomain := domainFromDTO(request)
+	userDomain := domainFromRequest(request)
 	userDomain, err := h.usersService.CreateUser(ctx, userDomain)
 	if err != nil {
 		responseHandler.ErrorResponse("failed create user", err)
@@ -39,9 +39,9 @@ func (h *UsersHttpHandler) CreateUser(rw http.ResponseWriter, r *http.Request) {
 	responseHandler.JSONResponse(response, http.StatusCreated)
 }
 
-func domainFromDTO(dto CreateUserRequest) domain.User {
+func domainFromRequest(request CreateUserRequest) domain.User {
 	return domain.NewUserUninitialized(
-		dto.FullName,
-		dto.PhoneNumber,
+		request.FullName,
+		request.PhoneNumber,
 	)
 }
