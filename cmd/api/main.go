@@ -12,6 +12,9 @@ import (
 	core_pgx_pool "github.com/roman-styazhkin/golang-todoapp/internal/core/repository/postgres/pool/pgx"
 	core_http_middleware "github.com/roman-styazhkin/golang-todoapp/internal/core/transport/http/middleware"
 	core_http_server "github.com/roman-styazhkin/golang-todoapp/internal/core/transport/http/server"
+	statistics_repository "github.com/roman-styazhkin/golang-todoapp/internal/features/statistics/repository/postgres"
+	statistics_service "github.com/roman-styazhkin/golang-todoapp/internal/features/statistics/service"
+	statistics_transport_http "github.com/roman-styazhkin/golang-todoapp/internal/features/statistics/transport/http"
 	tasks_repository "github.com/roman-styazhkin/golang-todoapp/internal/features/tasks/repository/postgres"
 	tasks_service "github.com/roman-styazhkin/golang-todoapp/internal/features/tasks/service"
 	tasks_transport_http "github.com/roman-styazhkin/golang-todoapp/internal/features/tasks/transport/http"
@@ -61,10 +64,16 @@ func main() {
 	tasksService := tasks_service.NewTasksService(tasksRepository)
 	tasksHandler := tasks_transport_http.NewTasksHttpHandler(tasksService)
 
+	logger.Debug("statistics feature...")
+	statisticsRepository := statistics_repository.NewStatisticsRepository(pool)
+	statisticsService := statistics_service.NewStatisticsService(statisticsRepository)
+	statisticsHandler := statistics_transport_http.NewStatisticsHttpHandler(statisticsService)
+
 	logger.Debug("init api version router...")
 	apiVersionRouter := core_http_server.NewApiVersionRouter(core_http_server.ApiVersionRouter1)
 	apiVersionRouter.RegisterRoutes(usersHandler.Routes()...)
 	apiVersionRouter.RegisterRoutes(tasksHandler.Routes()...)
+	apiVersionRouter.RegisterRoutes(statisticsHandler.Routes()...)
 
 	logger.Debug("init server...")
 	httpServer := core_http_server.NewHttpServer(
