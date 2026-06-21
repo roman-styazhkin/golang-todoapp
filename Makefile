@@ -49,8 +49,11 @@ migrate-down:
 	 down $(steps)
 
 
-port-forwarder:
+port-forwarder-up:
 	@docker compose up -d postgres-forwarder
+
+port-forwarder-down:
+	@docker compose down postgres-forwarder
 
 logs-cleanup:
 	@read -p "Очистить все log файлы? Опасность утери log файлов. [y/N]: " ans; \
@@ -65,3 +68,12 @@ todoapp-run:
 	@export LOGGER_FOLDER=${PROJECT_ROOT}/out/logs && \
 	export POSTGRES_HOST=localhost && \
 	go run cmd/api/main.go
+
+todoapp-deploy:
+	@docker compose up -d --build todoapp
+
+todoapp-undeploy:
+	@docker compose down todoapp
+
+ps:
+	@docker ps
