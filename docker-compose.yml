@@ -12,6 +12,7 @@ services:
       - POSTGRES_TIMEOUT=${POSTGRES_TIMEOUT}
       - HTTP_ADDRESS=${HTTP_ADDRESS}
       - HTTP_SHUTDOWN_TIMEOUT=${HTTP_SHUTDOWN_TIMEOUT}
+      - HTTP_ALLOWED_ORIGINS=${HTTP_ALLOWED_ORIGINS}
       - LOGGER_FOLDER=/app/out/logs
       - POSTGRES_HOST=todoapp-postgres
     volumes:

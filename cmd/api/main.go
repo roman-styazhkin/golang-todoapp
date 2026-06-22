@@ -90,10 +90,11 @@ func main() {
 	apiVersionRouter.RegisterRoutes(statisticsHandler.Routes()...)
 
 	logger.Debug("init server...")
+	httpConfig := core_http_server.NewConfigMust()
 	httpServer := core_http_server.NewHttpServer(
-		core_http_server.NewConfigMust(),
+		httpConfig,
 		logger,
-		core_http_middleware.CORS(),
+		core_http_middleware.CORS(httpConfig.AllowedOrigins),
 		core_http_middleware.RequestID(),
 		core_http_middleware.Logger(logger),
 		core_http_middleware.Trace(),
