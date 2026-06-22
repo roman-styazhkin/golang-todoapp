@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/roman-styazhkin/golang-todoapp/docs"
 	core_logger "github.com/roman-styazhkin/golang-todoapp/internal/core/logger"
 	core_http_middleware "github.com/roman-styazhkin/golang-todoapp/internal/core/transport/http/middleware"
+	httpSwagger "github.com/swaggo/http-swagger/v2"
 	"go.uber.org/zap"
 )
 
@@ -73,6 +75,25 @@ func (s *HttpServer) Run(ctx context.Context) error {
 	return nil
 }
 
+func (s *HttpServer) RegisterSwagger() {
+	s.mux.Handle(
+		"/swagger/",
+		httpSwagger.Handler(
+			httpSwagger.URL("/swagger/doc.json"),
+			httpSwagger.DefaultModelsExpandDepth(-1),
+		),
+	)
+
+	s.mux.HandleFunc(
+		"/swagger/doc.json",
+		func(rw http.ResponseWriter, r *http.Request) {
+			r.Header.Set("Content-Type", "application/json")
+			rw.WriteHeader(http.StatusOK)
+			_, _ = rw.Write([]byte(docs.SwaggerInfo.ReadDoc()))
+		},
+	)
+}
+
 func (s *HttpServer) RegisterRouters(routers ...*ApiVersionRouter) {
 	for _, router := range routers {
 		prefix := "/api/" + string(router.apiVersion)
@@ -80,5 +101,12 @@ func (s *HttpServer) RegisterRouters(routers ...*ApiVersionRouter) {
 			prefix+"/",
 			http.StripPrefix(prefix, router.mux),
 		)
+	}
+}
+
+func (s *HttpServer) RegisterRoutes(routes ...Route) {
+	for _, route := range routes {
+		pattern := fmt.Sprintf("%s %s", route.Method, route.Path)
+		s.mux.Handle(pattern, route.Handler)
 	}
 }

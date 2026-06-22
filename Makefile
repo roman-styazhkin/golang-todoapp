@@ -77,3 +77,6 @@ todoapp-undeploy:
 
 ps:
 	@docker ps
+
+swagger-gen:
+	@docker compose run --rm swagger init -g cmd/api/main.go -o docs --parseInternal --parseDependency

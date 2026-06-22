@@ -66,9 +66,9 @@ func (h *HttpResponseHandler) errResponse(
 	message string,
 	statusCode int,
 ) {
-	response := map[string]string{
-		"error":   err.Error(),
-		"message": message,
+	response := ErrResponse{
+		Err:     err.Error(),
+		Message: message,
 	}
 
 	h.JSONResponse(response, statusCode)
@@ -87,4 +87,12 @@ func (h *HttpResponseHandler) JSONResponse(
 
 func (h *HttpResponseHandler) NoContentResponse() {
 	h.rw.WriteHeader(http.StatusNoContent)
+}
+
+func (h *HttpResponseHandler) HtmlResponse(html []byte) {
+	h.rw.WriteHeader(http.StatusOK)
+	h.rw.Header().Set("Content-Type", "text/html; charset=utf-8")
+	if _, err := h.rw.Write(html); err != nil {
+		h.log.Error("write html http response", zap.Error(err))
+	}
 }

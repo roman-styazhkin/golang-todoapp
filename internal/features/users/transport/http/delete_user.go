@@ -8,6 +8,15 @@ import (
 	core_utils "github.com/roman-styazhkin/golang-todoapp/internal/core/utils"
 )
 
+// DeleteUser godoc
+// @Summary Удаление пользователя
+// @Description Удаление существующего в системе пользователя
+// @Tags users
+// @Param id path int true "id удаляемого пользователя"
+// @Success 204 "Успешное удаление пользователя"
+// @Failure 404 {object} core_http_response.ErrResponse "Пользователь с таким id не найден"
+// @Failure 500 {object} core_http_response.ErrResponse "Internal server error"
+// @Router /users/{id} [delete]
 func (h *UsersHttpHandler) DeleteUser(rw http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := core_logger.FromContext(ctx)
