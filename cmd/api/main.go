@@ -8,6 +8,7 @@ import (
 	"syscall"
 	"time"
 
+	_ "github.com/roman-styazhkin/golang-todoapp/docs"
 	core_logger "github.com/roman-styazhkin/golang-todoapp/internal/core/logger"
 	core_pgx_pool "github.com/roman-styazhkin/golang-todoapp/internal/core/repository/postgres/pool/pgx"
 	core_http_middleware "github.com/roman-styazhkin/golang-todoapp/internal/core/transport/http/middleware"
@@ -21,6 +22,9 @@ import (
 	users_repository "github.com/roman-styazhkin/golang-todoapp/internal/features/users/repository/postgres"
 	users_service "github.com/roman-styazhkin/golang-todoapp/internal/features/users/service"
 	users_transport_http "github.com/roman-styazhkin/golang-todoapp/internal/features/users/transport/http"
+	web_repository "github.com/roman-styazhkin/golang-todoapp/internal/features/web/postgres/file_system"
+	web_service "github.com/roman-styazhkin/golang-todoapp/internal/features/web/service"
+	web_transport_http "github.com/roman-styazhkin/golang-todoapp/internal/features/web/transport/http"
 	"go.uber.org/zap"
 )
 
@@ -28,6 +32,11 @@ var (
 	timeZone = time.UTC
 )
 
+// @title Todoapp
+// @version 1.0
+// @description Todoapp description
+// @host 127.0.0.1:5050
+// @BasePath /api/v1
 func main() {
 	time.Local = timeZone
 
@@ -69,6 +78,11 @@ func main() {
 	statisticsService := statistics_service.NewStatisticsService(statisticsRepository)
 	statisticsHandler := statistics_transport_http.NewStatisticsHttpHandler(statisticsService)
 
+	logger.Debug("web feature...")
+	webRepository := web_repository.NewWebRepository()
+	webService := web_service.NewWebService(webRepository)
+	webHttpHandler := web_transport_http.NewWebHttpHandler(webService)
+
 	logger.Debug("init api version router...")
 	apiVersionRouter := core_http_server.NewApiVersionRouter(core_http_server.ApiVersionRouter1)
 	apiVersionRouter.RegisterRoutes(usersHandler.Routes()...)
@@ -79,12 +93,15 @@ func main() {
 	httpServer := core_http_server.NewHttpServer(
 		core_http_server.NewConfigMust(),
 		logger,
+		core_http_middleware.CORS(),
 		core_http_middleware.RequestID(),
 		core_http_middleware.Logger(logger),
 		core_http_middleware.Trace(),
 		core_http_middleware.Panic(),
 	)
 	httpServer.RegisterRouters(apiVersionRouter)
+	httpServer.RegisterSwagger()
+	httpServer.RegisterRoutes(webHttpHandler.Routes()...)
 
 	logger.Debug("start router...")
 	if err = httpServer.Run(ctx); err != nil {

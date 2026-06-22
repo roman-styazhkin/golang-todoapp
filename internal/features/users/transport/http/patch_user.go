@@ -15,8 +15,8 @@ import (
 )
 
 type PatchUserRequest struct {
-	FullName    core_http_types.Nullable[string] `json:"full_name"`
-	PhoneNumber core_http_types.Nullable[string] `json:"phone_number"`
+	FullName    core_http_types.Nullable[string] `json:"full_name" swaggertype:"string" example:"Ivan Ivanov"`
+	PhoneNumber core_http_types.Nullable[string] `json:"phone_number" swaggertype:"string" example:"+71112223344"`
 }
 
 func (p *PatchUserRequest) Validate() error {
@@ -64,6 +64,27 @@ func (p *PatchUserRequest) Validate() error {
 
 type PatchUserResponse UserDTO
 
+// PatchUser godoc
+// @Summary Изменение пользователя
+// @Description Изменение существующего в системе пользователя
+// @Description #### Логика обновления полей (Three state logic):
+// @Description **1. Поле не передано** `phone_number is empty` игнорируется, значение phone_number в БД не меняется
+// @Description **2. Поле явно передано** `phone_number:+791112223344` значение phone_number меняется на новое в БД
+// @Description **3. Поле явно передано как null** `phone_number:null` значение phone_number меняется на null
+// @Description **Ограничения: ** full_name не может быть передан как null
+// @Description **Ограничения: ** full_name не может быть передан как "" (empty string)
+// @Description **Ограничения: ** phone_number не может быть передан как "" (empty string)
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param id path int true "id изменяемого пользователя"
+// @Param request body PatchUserRequest true "PatchUser тело запроса"
+// @Success 200 {object} PatchUserResponse "Успешно измененный пользователь"
+// @Failure 400 {object} core_http_response.ErrResponse "Bad request"
+// @Failure 404 {object} core_http_response.ErrResponse "User not found"
+// @Failure 409 {object} core_http_response.ErrResponse "Err conflict"
+// @Failure 500 {object} core_http_response.ErrResponse "Internal server error"
+// @Router /users/{id} [patch]
 func (h *UsersHttpHandler) PatchUser(rw http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := core_logger.FromContext(ctx)

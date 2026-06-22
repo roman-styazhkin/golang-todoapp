@@ -9,8 +9,19 @@ import (
 	core_utils "github.com/roman-styazhkin/golang-todoapp/internal/core/utils"
 )
 
-type GetUserResponse []UserDTO
+type GetUsersResponse []UserDTO
 
+// GetUsers godoc
+// @Summary Получение пользователей
+// @Description Получение существующих в системе пользователей
+// @Tags users
+// @Produce json
+// @Param limit query int false "Лимит получаемых пользователей"
+// @Param offset query int false "Смещение получаемых пользователей"
+// @Success 200 {object} GetUsersResponse "Успешное получение списка всех пользователей"
+// @Failure 400 {object} core_http_response.ErrResponse "Bad request"
+// @Failure 500 {object} core_http_response.ErrResponse "Internal server error"
+// @Router /users [get]
 func (h *UsersHttpHandler) GetUsers(rw http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := core_logger.FromContext(ctx)
@@ -31,7 +42,7 @@ func (h *UsersHttpHandler) GetUsers(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := GetUserResponse(dtoListFromDomains(userDomains))
+	response := GetUsersResponse(dtoListFromDomains(userDomains))
 	responseHandler.JSONResponse(response, http.StatusOK)
 }
 

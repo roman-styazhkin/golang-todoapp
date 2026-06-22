@@ -8,6 +8,16 @@ import (
 	core_utils "github.com/roman-styazhkin/golang-todoapp/internal/core/utils"
 )
 
+// DeleteTask godoc
+// @Summary Удаление задачи
+// @Description Удаление существующей в системе задачи
+// @Tags tasks
+// @Param id path int true "id удаляемой задачи"
+// @Success 204 "Успешное удаление задачи"
+// @Failure 400 {object} core_http_response.ErrResponse "Bad request"
+// @Failure 404 {object} core_http_response.ErrResponse "Task not found"
+// @Failure 500 {object} core_http_response.ErrResponse "Internal server err"
+// @Router /tasks/{id} [delete]
 func (h *TasksHttpHandler) DeleteTask(rw http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := core_logger.FromContext(ctx)

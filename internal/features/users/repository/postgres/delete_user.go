@@ -3,13 +3,15 @@ package users_repository
 import (
 	"context"
 	"fmt"
+
+	core_errors "github.com/roman-styazhkin/golang-todoapp/internal/core/errors"
 )
 
 func (r *UsersRepository) DeleteUser(
 	ctx context.Context,
 	id int,
 ) error {
-	ctx, cancel := context.WithTimeout(context.Background(), r.pool.GetOpTimeout())
+	ctx, cancel := context.WithTimeout(ctx, r.pool.GetOpTimeout())
 	defer cancel()
 
 	query := `
@@ -27,7 +29,7 @@ func (r *UsersRepository) DeleteUser(
 		return fmt.Errorf(
 			"user with id=%d not found, err: %w",
 			id,
-			err,
+			core_errors.ErrNotFound,
 		)
 	}
 
